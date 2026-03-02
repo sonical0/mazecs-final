@@ -124,65 +124,43 @@ void DrawScreen()
 
 void GenerateMaze(CellType[,] grid, int playerStartX, int playerStartY)
 {
-    const int cellW = width / 2;
-    const int cellH = height / 2; 
-
     for (var y = 0; y < height; y++)
         for (var x = 0; x < width; x++)
             grid[x, y] = CellType.Wall;
 
-    var stackX = new int[cellW * cellH];
-    var stackY = new int[cellW * cellH];
-    var stackTop = 0;
-
-    var visited = new bool[cellW, cellH];
-
     int[] dx = [ 0, 1, 0, -1 ];
     int[] dy = [ -1, 0, 1, 0 ];
+    int[] order = { 0, 1, 2, 3 };
+    var rng = new Random();
 
-    Random rng = new Random();
+    GenerateMazeRec(playerStartX, playerStartY);
 
-    var startCX = 0;
-    var startCY = 0;
-    visited[startCX, startCY] = true;
-    grid[startCX * 2, startCY * 2] = CellType.Corridor;
-
-    stackX[stackTop] = startCX;
-    stackY[stackTop] = startCY;
-    stackTop++;
-
-    while (stackTop > 0)
-    {
-        var cx = stackX[stackTop - 1];
-        var cy = stackY[stackTop - 1];
-
-        int[] order = { 0, 1, 2, 3 };
-        rng.Shuffle(order);
-
-        var found = false;
-        foreach (var dir in order)
-        {
-            var nx = cx + dx[dir];
-            var ny = cy + dy[dir];
-            if (nx >= 0 && nx < cellW && ny >= 0 && ny < cellH && !visited[nx, ny])
-            {
-                grid[cx * 2 + dx[dir], cy * 2 + dy[dir]] = CellType.Corridor;
-                grid[nx * 2, ny * 2] = CellType.Corridor;
-                visited[nx, ny] = true;
-                stackX[stackTop] = nx;
-                stackY[stackTop] = ny;
-                stackTop++;
-                found = true;
-                break;
-            }
-        }
-        if (!found) stackTop--;
-    }
-    var outX = (cellW - 1) * 2;
-    var outY = (cellH - 1) * 2;
+    var outX = (width  - 1) & ~1;
+    var outY = (height - 1) & ~1;
 
     grid[playerStartX, playerStartY] = CellType.Player;
     grid[outX, outY] = CellType.Exit;
+    
+    void GenerateMazeRec(int x, int y)
+    {
+        grid[x, y] = CellType.Corridor;
+        rng.Shuffle(order);
+        foreach (var dir in order)
+        {
+            if( inMaze(x, dx[dir], width , out var nx) && 
+                inMaze(y, dy[dir], height, out var ny) && 
+                grid[nx, ny] == CellType.Wall)
+            {
+                grid[(x + nx) / 2, (y + ny) / 2] = CellType.Corridor;
+                GenerateMazeRec(nx, ny);
+            }
+        }
+        bool inMaze(int val, int delta, int max, out int next)
+        {
+            next = val + delta * 2;
+            return next >= 0 && next < max;
+        }
+    }
 }
 
 enum State
