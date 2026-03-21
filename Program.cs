@@ -3,9 +3,10 @@ using SylLab.MazeCS;
 Vec2d MazePos  = new(0, 3);
 Vec2d MazeSize = new(50, 20);
 
-var InfoPos     = MazePos   + new Vec2d(0, MazeSize.Y);
-var WinEscPos   = InfoPos   + new Vec2d(0, 3);
-var PressKeyPos = WinEscPos + new Vec2d(0, 5);
+var InfoPos       = MazePos   + new Vec2d(0, MazeSize.Y);
+var PlayerInfoPos = InfoPos   + new Vec2d(0, 2);
+var WinEscPos     = InfoPos   + new Vec2d(0, 3);
+var PressKeyPos   = WinEscPos + new Vec2d(0, 5);
 
 const int HeaderPaddingX = 10;
 const int WinPaddingX = 2;
@@ -28,10 +29,14 @@ var player = new Player(maze);
 
 using (var screen = new ConsoleScreen(MazePos))
 {
+    player.InventoryChanged += (_, _) => DrawPlayerInfo(screen);
+    player.ScoreChanged     += (_, _) => DrawPlayerInfo(screen);
+
     screen.DrawFrame(Vec2d.Origin, HeaderPaddingX, HeaderColor, HeaderMsg);
     maze  .Draw(screen);
     player.Draw(screen);
     screen.DrawTextXY(InfoPos, InfoMsg, InfoColor);
+    DrawPlayerInfo(screen);
 
     while (player.IsPlaying)
     {
@@ -49,3 +54,7 @@ using (var screen = new ConsoleScreen(MazePos))
     screen.DrawTextXY(PressKeyPos, PressKeyMsg);
 }
 kbd.WaitKey();
+
+
+void DrawPlayerInfo(ConsoleScreen screen) =>
+    screen.DrawTextXY(PlayerInfoPos, $"Score : { player.Score, 3 } / Inventaire : { player.InventorySize } items");

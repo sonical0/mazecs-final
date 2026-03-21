@@ -16,6 +16,7 @@ public class KeyboardController : IController
             _ => new Vec2d(0, 0)
          };
 
+    public bool IsCollectPressed => _key == ConsoleKey.Spacebar;
     public bool IsEscapePressed => _key == ConsoleKey.Escape;
 }
 
