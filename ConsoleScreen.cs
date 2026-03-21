@@ -2,24 +2,14 @@
 
 public class ConsoleScreen : IDisposable
 {
-    public readonly ConsoleColor[] CellTypeColors = [
-        ConsoleColor.DarkGray, // Wall
-        ConsoleColor.DarkBlue, // Corridor
-        ConsoleColor.Yellow,   // Player
-        ConsoleColor.Green     // Exit
-    ];
-    public const string CellTypeSymbols = ".█@★";
-
-    public ConsoleScreen(Vec2d mazeOrigin)
+    public ConsoleScreen(Vec2d gridPos)
     {
-        MazeOrigin = mazeOrigin;
+        _gridPos = gridPos;
         Console.Clear();
         Console.CursorVisible = false;
     }
     public void Dispose() => 
         Console.CursorVisible = true;
-
-    public Vec2d MazeOrigin { get; }
 
     public void DrawTextXY(Vec2d pos, string text, ConsoleColor? color = null)
     {
@@ -51,19 +41,8 @@ public class ConsoleScreen : IDisposable
         DrawTextXY(IncPos(), $"╚{horizontal}╝", color);
     }
 
-    public void DrawCell(Vec2d mazePos, CellType type) => DrawTextXY(
-        MazeOrigin + mazePos,
-        CellTypeSymbols[(int)type].ToString(),
-        CellTypeColors[(int)type]
-    );
-  
-    public void DrawMaze(CellType[,] grid)
-    {
-        var mazeSize = new Vec2d(grid.GetLength(0), grid.GetLength(1));
-        
-        for (var pos = Vec2d.Origin; pos.IsIn(mazeSize); pos = pos.NextLTR(mazeSize.X))
-        {
-            DrawCell(pos, grid[pos.X, pos.Y]);
-        }
-    }
+    public void DrawGridCell(Vec2d pos, (string Content, ConsoleColor Color) info) =>
+        DrawTextXY(_gridPos + pos, info.Content, info.Color);
+    
+    private readonly Vec2d _gridPos;
 }

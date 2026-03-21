@@ -1,9 +1,9 @@
 using SylLab.MazeCS;
 
-Vec2d Offset = new(0, 3);
+Vec2d MazePos  = new(0, 3);
 Vec2d MazeSize = new(50, 20);
 
-var InfoPos     = Offset    + new Vec2d(0, MazeSize.Y);
+var InfoPos     = MazePos   + new Vec2d(0, MazeSize.Y);
 var WinEscPos   = InfoPos   + new Vec2d(0, 3);
 var PressKeyPos = WinEscPos + new Vec2d(0, 5);
 
@@ -22,40 +22,30 @@ const ConsoleColor EscColor      = ConsoleColor.Red;
 const ConsoleColor HeaderColor   = ConsoleColor.Cyan;
 const ConsoleColor InfoColor     = ConsoleColor.DarkCyan;
 
-var player = Vec2d.Origin;
-var mode = State.Playing;
 var kbd  = new KeyboardController();
-var grid = new MazeGen(MazeSize, player).Generate();
+var maze = new Maze(new MazeGen(MazeSize, Start: Vec2d.Origin));
+var player = new Player(maze);
 
-using (var screen = new ConsoleScreen(Offset))
+using (var screen = new ConsoleScreen(MazePos))
 {
     screen.DrawFrame(Vec2d.Origin, HeaderPaddingX, HeaderColor, HeaderMsg);
-    screen.DrawMaze (grid);
+    maze  .Draw(screen);
+    player.Draw(screen);
     screen.DrawTextXY(InfoPos, InfoMsg, InfoColor);
 
-    while (mode == State.Playing)
+    while (player.IsPlaying)
     {
-        var newPlayer = player;
-
         kbd.WaitKey();
-        newPlayer += kbd.DirectionPressed;
-        if (kbd.IsEscapePressed)
-            mode = State.Canceled;
-        if (newPlayer.IsIn(MazeSize) && grid[newPlayer.X, newPlayer.Y] != CellType.Wall)
+        if(player.Move(kbd, out var prevPos))
         {
-            if (grid[newPlayer.X, newPlayer.Y] == CellType.Exit) mode = State.Won;
-
-            UpdateCell(screen, player, CellType.Corridor);
-            UpdateCell(screen, player = newPlayer, CellType.Player);
+            maze.RedrawCell(screen, prevPos);
+            player.Draw(screen);
         }
     }
-    if(mode == State.Won)
+    if(player.HasWon)
         screen.DrawFrame(WinEscPos, WinPaddingX, WinColor, WinMsg1, WinMsg2);
     else
         screen.DrawTextXY(WinEscPos, EscMsg, EscColor);
     screen.DrawTextXY(PressKeyPos, PressKeyMsg);
 }
 kbd.WaitKey();
-
-void UpdateCell(ConsoleScreen screen, Vec2d mazePos, CellType type) =>
-    screen.DrawCell(mazePos, grid[mazePos.X, mazePos.Y] = type);
