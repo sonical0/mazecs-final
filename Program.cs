@@ -7,8 +7,6 @@ var InfoPos     = Offset    + new Vec2d(0, MazeSize.Y);
 var WinEscPos   = InfoPos   + new Vec2d(0, 3);
 var PressKeyPos = WinEscPos + new Vec2d(0, 5);
 
-var grid = new CellType[MazeSize.X, MazeSize.Y];
-
 const int HeaderPaddingX = 10;
 const int WinPaddingX = 2;
 
@@ -26,11 +24,11 @@ const ConsoleColor InfoColor     = ConsoleColor.DarkCyan;
 
 var player = Vec2d.Origin;
 var mode = State.Playing;
-var kbd = new KeyboardController();
+var kbd  = new KeyboardController();
+var grid = new MazeGen(MazeSize, player).Generate();
+
 using (var screen = new ConsoleScreen(Offset))
 {
-    GenerateMaze(grid, player);
-
     screen.DrawFrame(Vec2d.Origin, HeaderPaddingX, HeaderColor, HeaderMsg);
     screen.DrawMaze (grid);
     screen.DrawTextXY(InfoPos, InfoMsg, InfoColor);
@@ -59,53 +57,5 @@ using (var screen = new ConsoleScreen(Offset))
 }
 kbd.WaitKey();
 
-#region Functions
-
-void UpdateCell(ConsoleScreen screen, Vec2d mazePos, CellType type)
-{
-    SetTile(mazePos, type);
-    screen.DrawCell(mazePos, type);
-}
-
-void SetTile(Vec2d pos, CellType type) =>
-    grid[pos.X, pos.Y] = type;
-
-void GenerateMaze(CellType[,] grid, Vec2d start)
-{
-    for (var pos = Vec2d.Origin; pos.IsIn(MazeSize); pos = pos.NextLTR(MazeSize.X))
-    {
-        SetTile(pos, CellType.Wall);
-    }
-    int[][] orders = [
-        [ 0, 1, 2, 3 ], [ 0, 1, 3, 2 ], [ 0, 2, 1, 3 ], [ 0, 2, 3, 1 ], [ 0, 3, 1, 2 ], [ 0, 3, 2, 1 ],
-        [ 1, 0, 2, 3 ], [ 1, 0, 3, 2 ], [ 1, 2, 0, 3 ], [ 1, 2, 3, 0 ], [ 1, 3, 0, 2 ], [ 1, 3, 2, 0 ],
-        [ 2, 0, 1, 3 ], [ 2, 0, 3, 1 ], [ 2, 1, 0, 3 ], [ 2, 1, 3, 0 ], [ 2, 3, 0, 1 ], [ 2, 3, 1, 0 ],
-        [ 3, 0, 1, 2 ], [ 3, 0, 2, 1 ], [ 3, 1, 0, 2 ], [ 3, 1, 2, 0 ], [ 3, 2, 0, 1 ], [ 3, 2, 1, 0 ]
-    ];
-    Vec2d[] dirs = [Vec2d.North * 2, Vec2d.East * 2, Vec2d.South * 2, Vec2d.West * 2];
-    var rng = new Random();
-
-    GenerateMazeRec(start);
-
-    SetTile(start, CellType.Player);
-    SetTile(
-
-        (MazeSize + Vec2d.North + Vec2d.West).Even(),
-        CellType.Exit
-    );
-    void GenerateMazeRec(Vec2d pos)
-    {
-        SetTile(pos, CellType.Corridor);
-        foreach (var index in rng.GetItems(orders, 1).First())
-        {
-            var next = pos + dirs[index];
-
-            if (next.IsIn(MazeSize) && grid[next.X, next.Y] == CellType.Wall)
-            {
-                SetTile((pos + next) / 2, CellType.Corridor);
-                GenerateMazeRec(next);
-            }
-        }
-    }
-}
-#endregion
+void UpdateCell(ConsoleScreen screen, Vec2d mazePos, CellType type) =>
+    screen.DrawCell(mazePos, grid[mazePos.X, mazePos.Y] = type);
