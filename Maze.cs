@@ -2,7 +2,7 @@
 
 public class Maze
 {
-    public Maze(MazeGen gen)
+    public Maze(IMazeGenerator gen)
     {
         _grid = gen.Generate();
         MazeSize = new(_grid.GetLength(0), _grid.GetLength(1));

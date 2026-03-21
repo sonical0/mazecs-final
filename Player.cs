@@ -2,7 +2,7 @@
 
 public class Player(Maze maze)
 {
-    public bool Move(KeyboardController kbd, out Vec2d prevPos)
+    public bool Move(IController kbd, out Vec2d prevPos)
     {
         prevPos = _pos;
         _pos = NextWalkablePos(_pos + kbd.DirectionPressed);        

@@ -1,6 +1,6 @@
 ﻿namespace SylLab.MazeCS;
 
-public class KeyboardController
+public class KeyboardController : IController
 {
     ConsoleKey? _key = null;
 

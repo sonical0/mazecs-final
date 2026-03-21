@@ -1,6 +1,6 @@
 ﻿namespace SylLab.MazeCS;
 
-public class MazeGen(Vec2d MazeSize, Vec2d Start)
+public class MazeGen(Vec2d MazeSize, Vec2d Start) : IMazeGenerator
 {    
     public CellType[,] Generate()
     {
