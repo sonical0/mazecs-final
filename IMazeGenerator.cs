@@ -2,6 +2,6 @@
 
 public interface IMazeGenerator
 {
-    CellType[,] Generate();
+    Cell[,] Generate();
 }
 

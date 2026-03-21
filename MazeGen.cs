@@ -1,14 +1,16 @@
 ﻿namespace SylLab.MazeCS;
 
-public class MazeGen(Vec2d MazeSize, Vec2d Start) : IMazeGenerator
+using SylLab.MazeCS.Cells;
+
+public class MazeGen(Vec2d MazeSize, Vec2d StartPos) : IMazeGenerator
 {    
-    public CellType[,] Generate()
+    public Cell[,] Generate()
     {
-        var grid = new CellType[MazeSize.X, MazeSize.Y];
+        var grid = new Cell[MazeSize.X, MazeSize.Y];
         
         for (var pos = Vec2d.Origin; pos.IsIn(MazeSize); pos = pos.NextLTR(MazeSize.X))
         {
-            SetTile(pos, CellType.Wall);
+            SetTile(pos, Wall.Instance);
         }
         int[][] orders = [
             [ 0, 1, 2, 3 ], [ 0, 1, 3, 2 ], [ 0, 2, 1, 3 ], [ 0, 2, 3, 1 ], [ 0, 3, 1, 2 ], [ 0, 3, 2, 1 ],
@@ -19,28 +21,28 @@ public class MazeGen(Vec2d MazeSize, Vec2d Start) : IMazeGenerator
         Vec2d[] dirs = [Vec2d.North * 2, Vec2d.East * 2, Vec2d.South * 2, Vec2d.West * 2];
         var rng = new Random();
 
-        GenerateMazeRec(Start);
+        GenerateMazeRec(StartPos);
 
-        SetTile(Start, CellType.Start);
+        SetTile(StartPos, Start.Instance);
         SetTile(
 
             (MazeSize + Vec2d.North + Vec2d.West).Even(),
-            CellType.Exit
+            Exit.Instance
         );
         return grid;
 
-        void SetTile(Vec2d pos, CellType type) => grid[pos.X, pos.Y] = type;
+        void SetTile(Vec2d pos, Cell type) => grid[pos.X, pos.Y] = type;
 
         void GenerateMazeRec(Vec2d pos)
         {
-            SetTile(pos, CellType.Corridor);
+            SetTile(pos, Room.Instance);
             foreach (var index in rng.GetItems(orders, 1).First())
             {
                 var next = pos + dirs[index];
 
-                if (next.IsIn(MazeSize) && grid[next.X, next.Y] == CellType.Wall)
+                if (next.IsIn(MazeSize) && !grid[next.X, next.Y].IsTraversable)
                 {
-                    SetTile((pos + next) / 2, CellType.Corridor);
+                    SetTile((pos + next) / 2, Room.Instance);
                     GenerateMazeRec(next);
                 }
             }

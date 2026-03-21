@@ -41,8 +41,8 @@ public class ConsoleScreen : IDisposable, IGridDisplay
         DrawTextXY(IncPos(), $"╚{horizontal}╝", color);
     }
 
-    public void DrawGridCell(Vec2d pos, (string Content, ConsoleColor Color) info) =>
-        DrawTextXY(_gridPos + pos, info.Content, info.Color);
+    public void DrawGridCell(Vec2d pos, string content, ConsoleColor color) =>
+        DrawTextXY(_gridPos + pos, content, color);
     
     private readonly Vec2d _gridPos;
 }

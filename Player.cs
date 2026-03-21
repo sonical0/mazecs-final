@@ -7,15 +7,15 @@ public class Player(Maze maze)
         prevPos = _pos;
         _pos = NextWalkablePos(_pos + kbd.DirectionPressed);        
         
-        HasWon    = maze[_pos] == CellType.Exit;
+        HasWon    = maze[_pos].IsEndPos;
         IsPlaying = !HasWon && !kbd.IsEscapePressed;
         return prevPos != _pos;
     }
 
     private Vec2d NextWalkablePos(Vec2d nextPos) =>
-        nextPos.IsIn(maze.MazeSize) && maze[nextPos] != CellType.Wall ? nextPos : _pos;
+        nextPos.IsIn(maze.MazeSize) && maze[nextPos].IsTraversable ? nextPos : _pos;
     public void Draw(IGridDisplay gridDisp) =>
-        gridDisp.DrawGridCell(_pos, ("@", ConsoleColor.Yellow));
+        gridDisp.DrawGridCell(_pos, "@", ConsoleColor.Yellow);
     public Maze Maze => maze;
     public bool IsPlaying { get; private set; } = true;
     public bool HasWon    { get; private set; } = false;

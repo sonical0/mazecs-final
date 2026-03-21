@@ -7,9 +7,9 @@ public class Maze
         _grid = gen.Generate();
         MazeSize = new(_grid.GetLength(0), _grid.GetLength(1));
     }
-    public Vec2d StartPos => CellPositions.First(pos => this[pos] == CellType.Start);
+    public Vec2d StartPos => CellPositions.First(pos => this[pos].IsStartPos);
     public Vec2d MazeSize { get; init; }
-    public CellType this[Vec2d pos] => _grid[pos.X, pos.Y];
+    public Cell this[Vec2d pos] => _grid[pos.X, pos.Y];
     IEnumerable<Vec2d> CellPositions
     {
         get
@@ -21,16 +21,8 @@ public class Maze
         }
     }
 
-    public void RedrawCell(IGridDisplay gridDisp, Vec2d mazePos) => gridDisp.DrawGridCell(
-        mazePos,
-        this[mazePos] switch {
-            CellType.Wall     => ("█", ConsoleColor.DarkGray),
-            CellType.Corridor or
-            CellType.Start    => (".", ConsoleColor.DarkBlue),
-            CellType.Exit     => ("★", ConsoleColor.Green),
-            _ => throw new InvalidOperationException($"Invalid cell type: {this[mazePos]}")
-        }
-    );
+    public void RedrawCell(IGridDisplay gridDisp, Vec2d mazePos) => 
+        gridDisp.DrawGridCell(mazePos, this[mazePos]);
 
     public void Draw(IGridDisplay gridDisp)
     {
@@ -38,6 +30,6 @@ public class Maze
             RedrawCell(gridDisp, pos);
     }
 
-    private readonly CellType[,] _grid;
+    private readonly Cell[,] _grid;
 }
 
