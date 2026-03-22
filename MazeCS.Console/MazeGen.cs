@@ -1,7 +1,7 @@
-﻿namespace SylLab.MazeCS;
+﻿namespace MazeCS;
 
-using SylLab.MazeCS.Cells;
-using SylLab.MazeCS.Collectables;
+using MazeCS.Cells;
+using MazeCS.Collectables;
 
 public class MazeGen(Vec2d MazeSize, Vec2d StartPos, double coinRate, double doorRate) : IMazeGenerator
 {    

@@ -1,7 +1,9 @@
-﻿namespace SylLab.MazeCS;
+﻿namespace MazeCS;
 
 public class Player(Maze maze)
 {
+    public const string PlayerSymbol = "@";
+
     public bool Move(IController kbd, out Vec2d prevPos)
     {
         var prevSize  = InventorySize;
@@ -24,7 +26,7 @@ public class Player(Maze maze)
     private Vec2d NextWalkablePos(Vec2d nextPos) =>
         nextPos.IsIn(maze.MazeSize) && maze[nextPos].TryTraverse(_inventory) ? nextPos : _pos;
     public void Draw(IGridDisplay gridDisp) =>
-        gridDisp.DrawGridCell(_pos, "@", ConsoleColor.Yellow);
+        gridDisp.DrawGridCell(_pos, PlayerSymbol, ConsoleColor.Yellow);
     public Maze Maze => maze;
     public bool IsPlaying { get; private set; } = true;
     public bool HasWon    { get; private set; } = false;

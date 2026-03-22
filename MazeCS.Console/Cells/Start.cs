@@ -1,4 +1,4 @@
-﻿namespace SylLab.MazeCS.Cells;
+﻿namespace MazeCS.Cells;
 
 internal class Start : Room
 {

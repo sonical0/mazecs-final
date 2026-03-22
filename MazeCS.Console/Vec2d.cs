@@ -1,4 +1,4 @@
-﻿namespace SylLab.MazeCS;
+﻿namespace MazeCS;
 
 public record Vec2d(int X, int Y)
 {

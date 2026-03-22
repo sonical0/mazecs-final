@@ -1,4 +1,4 @@
-﻿namespace SylLab.MazeCS.Collectables;
+﻿namespace MazeCS.Collectables;
 
 internal class Key : ICollectable
 {

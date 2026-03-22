@@ -1,4 +1,4 @@
-﻿namespace SylLab.MazeCS;
+﻿namespace MazeCS.ConsoleUI;
 
 public class ConsoleScreen : IDisposable, IGridDisplay
 {

@@ -1,4 +1,4 @@
-﻿namespace SylLab.MazeCS;
+﻿namespace MazeCS;
 
 public interface IMazeGenerator
 {

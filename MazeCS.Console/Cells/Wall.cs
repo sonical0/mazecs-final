@@ -1,4 +1,4 @@
-﻿namespace SylLab.MazeCS.Cells;
+﻿namespace MazeCS.Cells;
 
 internal class Wall : Cell
 {
@@ -6,5 +6,5 @@ internal class Wall : Cell
     private Wall() { }
 
     public override ConsoleColor Color => ConsoleColor.DarkGray;
-    public override string Content => "█";
+    public override string Content => WallSymbol;
 }

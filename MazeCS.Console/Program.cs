@@ -1,4 +1,5 @@
-using SylLab.MazeCS;
+using MazeCS;
+using MazeCS.ConsoleUI;
 
 Vec2d MazePos  = new(0, 3);
 Vec2d MazeSize = new(50, 20);
@@ -10,6 +11,9 @@ var PressKeyPos   = WinEscPos + new Vec2d(0, 5);
 
 const int HeaderPaddingX = 10;
 const int WinPaddingX = 2;
+
+const double CoinRate = .3;
+const double DoorRate = .2;
 
 const string HeaderMsg = "🏃 LABYRINTHE ASCII  C#  🏃";
 const string InfoMsg   = "  [Z/↑] Haut   [S/↓] Bas   [Q/←] Gauche   [D/→] Droite   [Échap] Quitter";
@@ -26,7 +30,7 @@ const ConsoleColor InfoColor     = ConsoleColor.DarkCyan;
 var kbd  = new KeyboardController();
 var maze = new Maze(new MazeGen(
     MazeSize, StartPos: Vec2d.Origin, 
-    coinRate: .3, doorRate: .2
+    CoinRate, DoorRate
 ));
 var player = new Player(maze);
 
