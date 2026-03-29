@@ -1,13 +1,18 @@
 @implements IGridDisplay
+@implements IController
 @using MazeCS
 
-<div class="maze-grid" style="grid-template-columns: repeat(@Maze.MazeSize.X, var(--cell-size));">
+<div class="maze-grid"
+     style="grid-template-columns: repeat(@Maze.MazeSize.X, var(--cell-size));"
+     tabindex="0"
+     @onkeydown="HandleKeyDown"
+     @onkeydown:preventDefault>
     @for (int y = 0; y < grid.Count; y++)
     {
         var row = grid[y];
         @for (int x = 0; x < row.Count; x++)
         {
-            var pos    = new Vec2d(x, y);
+            var pos     = new Vec2d(x, y);
             var isPlayer = playerPos == pos;
             var content  = isPlayer ? Player.PlayerSymbol : row[x];
             <div class="maze-cell @GetCellClass(content)">@content</div>
@@ -22,35 +27,63 @@
     [Parameter]
     public required Player Player { get; set; }
 
+    // ── IGridDisplay ────────────────────────────────────────
     private List<List<string>> grid = new();
     private Vec2d? playerPos = null;
 
     protected override void OnParametersSet()
     {
-        // (Re)initialise la grille avec des cases vides
         grid = Enumerable.Range(0, Maze.MazeSize.Y)
             .Select(_ => Enumerable.Repeat(Cell.EmptyRoomSymbol, Maze.MazeSize.X).ToList())
             .ToList();
         playerPos = null;
-
-        // Appelle Draw sur le labyrinthe puis le joueur :
-        // chaque case appelle DrawGridCell sur ce composant
         Maze.Draw(this);
         Player.Draw(this);
     }
 
-    // Implémentation de IGridDisplay
     void IGridDisplay.DrawGridCell(Vec2d pos, string content, ConsoleColor _)
     {
         if (content == Player.PlayerSymbol)
         {
-            // On mémorise la position du joueur, on ne l'écrit pas dans la grille
             playerPos = pos;
             return;
         }
         grid[pos.Y][pos.X] = content;
     }
 
+    // ── IController ─────────────────────────────────────────
+    private string _key = string.Empty;
+
+    public Vec2d DirectionPressed => _key switch
+    {
+        "ArrowUp"    or "z" or "Z" => Vec2d.North,
+        "ArrowDown"  or "s" or "S" => Vec2d.South,
+        "ArrowLeft"  or "q" or "Q" => Vec2d.West,
+        "ArrowRight" or "d" or "D" => Vec2d.East,
+        _                          => Vec2d.Origin
+    };
+
+    public bool IsCollectPressed => _key is "e" or "E" or " ";
+    public bool IsEscapePressed  => _key is "Escape";
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        _key = e.Key;
+        Player.Move(this, out _);
+
+        // Redessine la grille complète après le déplacement
+        grid = Enumerable.Range(0, Maze.MazeSize.Y)
+            .Select(_ => Enumerable.Repeat(Cell.EmptyRoomSymbol, Maze.MazeSize.X).ToList())
+            .ToList();
+        playerPos = null;
+        Maze.Draw(this);
+        Player.Draw(this);
+
+        _key = string.Empty;
+        StateHasChanged();
+    }
+
+    // ── CSS helper ──────────────────────────────────────────
     private static string GetCellClass(string content) => content switch
     {
         Cell.WallSymbol          => "cell-wall",
