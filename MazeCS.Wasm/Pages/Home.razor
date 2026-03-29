@@ -1,0 +1,23 @@
+@page "/"
+@using MazeCS
+
+<PageTitle>MazeCS</PageTitle>
+
+<h1>Labyrinthe MazeCS</h1>
+
+<p>Score : <strong>@Player.Score</strong></p>
+<p>Inventaire : <strong>@Player.InventorySize</strong> objet(s)</p>
+
+@code {
+    public required Maze Maze { get; set; }
+    public required Player Player { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Maze = new Maze(new MazeGen(new Vec2d(21, 21), Vec2d.Origin, 0.2, 0.1));
+        Player = new Player(Maze);
+
+        Player.InventoryChanged += (_, _) => StateHasChanged();
+        Player.ScoreChanged += (_, _) => StateHasChanged();
+    }
+}
