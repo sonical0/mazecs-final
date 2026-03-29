@@ -1,0 +1,40 @@
+@using MazeCS
+
+<div class="maze-grid" style="grid-template-columns: repeat(@Maze.MazeSize.X, var(--cell-size));">
+    @for (int y = 0; y < Maze.MazeSize.Y; y++)
+    {
+        @for (int x = 0; x < Maze.MazeSize.X; x++)
+        {
+            var pos = new Vec2d(x, y);
+            var isPlayer = (pos == Player._pos);
+            var cell = Maze[pos];
+            var cssClass = GetCellClass(cell, isPlayer);
+            var symbol = isPlayer ? Player.PlayerSymbol : cell.Content;
+
+            <div class="maze-cell @cssClass">@symbol</div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public required Maze Maze { get; set; }
+
+    [Parameter]
+    public required Player Player { get; set; }
+
+    private static string GetCellClass(Cell cell, bool isPlayer)
+    {
+        if (isPlayer) return "cell-player";
+        return cell.Content switch
+        {
+            Cell.WallSymbol           => "cell-wall",
+            Cell.EmptyRoomSymbol      => "cell-room",
+            Cell.RoomWithItemsSymbol  => "cell-room-items",
+            Cell.OpenedDoorSymbol     => "cell-door-open",
+            Cell.ClosedDoorSymbol     => "cell-door-closed",
+            Cell.ExitSymbol           => "cell-exit",
+            _                         => "cell-room"
+        };
+    }
+}

@@ -1,5 +1,6 @@
 @page "/"
 @using MazeCS
+@using MazeCS.Wasm.Layout
 
 <PageTitle>MazeCS</PageTitle>
 
@@ -7,6 +8,8 @@
 
 <p>Score : <strong>@Player.Score</strong></p>
 <p>Inventaire : <strong>@Player.InventorySize</strong> objet(s)</p>
+
+<WebMaze Maze="Maze" Player="Player" />
 
 @code {
     public required Maze Maze { get; set; }
@@ -21,3 +24,4 @@
         Player.ScoreChanged += (_, _) => StateHasChanged();
     }
 }
+

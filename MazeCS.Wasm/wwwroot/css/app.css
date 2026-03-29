@@ -113,3 +113,69 @@ code {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* ── Maze component ──────────────────────────────────────── */
+:root {
+    --cell-size: 24px;
+}
+
+.maze-grid {
+    display: inline-grid;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: calc(var(--cell-size) * 0.75);
+    line-height: var(--cell-size);
+    border: 2px solid #333;
+    user-select: none;
+}
+
+.maze-cell {
+    width:  var(--cell-size);
+    height: var(--cell-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Wall */
+.cell-wall {
+    background-color: #555;
+    color: #555;
+}
+
+/* Empty room */
+.cell-room {
+    background-color: #1a1a2e;
+    color: #1a1a2e;
+}
+
+/* Room with items (dot) */
+.cell-room-items {
+    background-color: #1a1a2e;
+    color: #f0a500;
+}
+
+/* Open door */
+.cell-door-open {
+    background-color: #1a1a2e;
+    color: #7ec8e3;
+}
+
+/* Closed door */
+.cell-door-closed {
+    background-color: #1a1a2e;
+    color: #e07b39;
+}
+
+/* Exit */
+.cell-exit {
+    background-color: #1a1a2e;
+    color: #4caf50;
+}
+
+/* Player */
+.cell-player {
+    background-color: #1a1a2e;
+    color: #f5e642;
+    font-weight: bold;
+}
