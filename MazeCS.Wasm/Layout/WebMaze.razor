@@ -1,17 +1,16 @@
+@implements IGridDisplay
 @using MazeCS
 
 <div class="maze-grid" style="grid-template-columns: repeat(@Maze.MazeSize.X, var(--cell-size));">
-    @for (int y = 0; y < Maze.MazeSize.Y; y++)
+    @for (int y = 0; y < grid.Count; y++)
     {
-        @for (int x = 0; x < Maze.MazeSize.X; x++)
+        var row = grid[y];
+        @for (int x = 0; x < row.Count; x++)
         {
-            var pos = new Vec2d(x, y);
-            var isPlayer = (pos == Player._pos);
-            var cell = Maze[pos];
-            var cssClass = GetCellClass(cell, isPlayer);
-            var symbol = isPlayer ? Player.PlayerSymbol : cell.Content;
-
-            <div class="maze-cell @cssClass">@symbol</div>
+            var pos    = new Vec2d(x, y);
+            var isPlayer = playerPos == pos;
+            var content  = isPlayer ? Player.PlayerSymbol : row[x];
+            <div class="maze-cell @GetCellClass(content)">@content</div>
         }
     }
 </div>
@@ -23,18 +22,44 @@
     [Parameter]
     public required Player Player { get; set; }
 
-    private static string GetCellClass(Cell cell, bool isPlayer)
+    private List<List<string>> grid = new();
+    private Vec2d? playerPos = null;
+
+    protected override void OnParametersSet()
     {
-        if (isPlayer) return "cell-player";
-        return cell.Content switch
-        {
-            Cell.WallSymbol           => "cell-wall",
-            Cell.EmptyRoomSymbol      => "cell-room",
-            Cell.RoomWithItemsSymbol  => "cell-room-items",
-            Cell.OpenedDoorSymbol     => "cell-door-open",
-            Cell.ClosedDoorSymbol     => "cell-door-closed",
-            Cell.ExitSymbol           => "cell-exit",
-            _                         => "cell-room"
-        };
+        // (Re)initialise la grille avec des cases vides
+        grid = Enumerable.Range(0, Maze.MazeSize.Y)
+            .Select(_ => Enumerable.Repeat(Cell.EmptyRoomSymbol, Maze.MazeSize.X).ToList())
+            .ToList();
+        playerPos = null;
+
+        // Appelle Draw sur le labyrinthe puis le joueur :
+        // chaque case appelle DrawGridCell sur ce composant
+        Maze.Draw(this);
+        Player.Draw(this);
     }
+
+    // Implémentation de IGridDisplay
+    void IGridDisplay.DrawGridCell(Vec2d pos, string content, ConsoleColor _)
+    {
+        if (content == Player.PlayerSymbol)
+        {
+            // On mémorise la position du joueur, on ne l'écrit pas dans la grille
+            playerPos = pos;
+            return;
+        }
+        grid[pos.Y][pos.X] = content;
+    }
+
+    private static string GetCellClass(string content) => content switch
+    {
+        Cell.WallSymbol          => "cell-wall",
+        Cell.EmptyRoomSymbol     => "cell-room",
+        Cell.RoomWithItemsSymbol => "cell-room-items",
+        Cell.OpenedDoorSymbol    => "cell-door-open",
+        Cell.ClosedDoorSymbol    => "cell-door-closed",
+        Cell.ExitSymbol          => "cell-exit",
+        Player.PlayerSymbol      => "cell-player",
+        _                        => "cell-room"
+    };
 }
